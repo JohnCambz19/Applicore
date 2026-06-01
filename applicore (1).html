@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applicore — AI-Powered Job Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #FAF9F6; --ink: #1A1814; --ink-light: #6B6760; --ink-faint: #C8C5BE;
+    --accent: #2D5BE3; --accent-light: #EEF2FD;
+    --success: #1A8A5A; --warn: #B85C00; --danger: #B82424;
+    --border: rgba(26,24,20,0.10);
+    --serif: 'DM Serif Display', Georgia, serif; --sans: 'DM Sans', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--sans); background: var(--cream); color: var(--ink); font-size: 16px; line-height: 1.7; overflow-x: hidden; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; height: 64px; background: rgba(250,249,246,0.88); backdrop-filter: blur(12px); border-bottom: 0.5px solid var(--border); }
+  .logo { font-family: var(--serif); font-size: 22px; letter-spacing: -0.5px; color: var(--ink); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 2rem; }
+  .nav-links a { font-size: 14px; color: var(--ink-light); text-decoration: none; font-weight: 400; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta { background: var(--ink); color: var(--cream) !important; padding: 8px 20px; border-radius: 100px; font-size: 14px; font-weight: 500; transition: opacity 0.2s !important; }
+  .nav-cta:hover { opacity: 0.8; }
+
+  .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 100px 2rem 80px; text-align: center; }
+  .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); background: var(--accent-light); padding: 6px 16px; border-radius: 100px; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s 0.1s forwards; }
+  .hero h1 { font-family: var(--serif); font-size: clamp(48px, 7vw, 88px); line-height: 1.05; letter-spacing: -1.5px; color: var(--ink); max-width: 780px; margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.7s 0.2s forwards; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero p { font-size: 18px; color: var(--ink-light); font-weight: 300; max-width: 520px; margin: 0 auto 2.5rem; opacity: 0; animation: fadeUp 0.7s 0.35s forwards; }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s 0.5s forwards; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 100px; font-size: 15px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; font-family: var(--sans); }
+  .btn-primary { background: var(--ink); color: var(--cream); }
+  .btn-primary:hover { background: #333; transform: translateY(-1px); }
+  .btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--ink-light); transform: translateY(-1px); }
+  .hero-note { margin-top: 1.25rem; font-size: 13px; color: var(--ink-faint); opacity: 0; animation: fadeUp 0.7s 0.6s forwards; }
+
+  .proof { padding: 3rem 2rem; text-align: center; border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); background: white; }
+  .proof p { font-size: 13px; color: var(--ink-faint); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 1.5rem; }
+  .proof-stats { display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap; }
+  .stat-val { font-family: var(--serif); font-size: 36px; color: var(--ink); }
+  .stat-label { font-size: 13px; color: var(--ink-light); margin-top: 2px; }
+
+  .features { padding: 8rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-label { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 1rem; }
+  .section-title { font-family: var(--serif); font-size: clamp(32px, 4vw, 52px); line-height: 1.1; letter-spacing: -0.5px; max-width: 560px; margin-bottom: 1rem; }
+  .section-sub { font-size: 16px; color: var(--ink-light); font-weight: 300; max-width: 480px; margin-bottom: 4rem; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .feat-card { background: white; padding: 2.5rem; transition: background 0.2s; }
+  .feat-card:hover { background: var(--accent-light); }
+  .feat-icon { width: 44px; height: 44px; background: var(--accent-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; }
+  .feat-icon svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .feat-card h3 { font-size: 17px; font-weight: 500; margin-bottom: 8px; letter-spacing: -0.2px; }
+  .feat-card p { font-size: 14px; color: var(--ink-light); line-height: 1.65; font-weight: 300; }
+
+  .how { padding: 6rem 2rem; background: white; }
+  .how-inner { max-width: 900px; margin: 0 auto; }
+  .steps { margin-top: 3rem; display: flex; flex-direction: column; gap: 0; }
+  .step { display: grid; grid-template-columns: 64px 1fr; gap: 2rem; padding: 2rem 0; border-bottom: 0.5px solid var(--border); align-items: start; }
+  .step:last-child { border-bottom: none; }
+  .step-num { font-family: var(--serif); font-size: 40px; color: var(--ink-faint); line-height: 1; padding-top: 4px; }
+  .step h3 { font-size: 18px; font-weight: 500; margin-bottom: 6px; letter-spacing: -0.2px; }
+  .step p { font-size: 14px; color: var(--ink-light); font-weight: 300; }
+
+  .app-section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .app-wrapper { background: white; border: 0.5px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.06); }
+  .app-bar { background: var(--ink); padding: 14px 20px; display: flex; align-items: center; gap: 8px; }
+  .app-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .app-title { color: rgba(255,255,255,0.6); font-size: 13px; margin-left: auto; margin-right: auto; }
+  .app-body { padding: 2rem; }
+
+  .atabs { display: flex; gap: 4px; border-bottom: 0.5px solid var(--border); margin-bottom: 1.5rem; }
+  .atab { padding: 8px 16px; font-size: 13px; border: none; background: none; color: var(--ink-light); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -0.5px; font-family: var(--sans); transition: color 0.15s; }
+  .atab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+  .apanel { display: none; } .apanel.active { display: block; }
+  .arow { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .acard { background: var(--cream); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .acard label { font-size: 11px; color: var(--ink-light); display: block; margin-bottom: 8px; letter-spacing: 0.3px; text-transform: uppercase; }
+  textarea.ainput { width: 100%; background: white; border: 0.5px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: var(--sans); color: var(--ink); resize: vertical; line-height: 1.6; }
+  textarea.ainput:focus { outline: none; border-color: var(--accent); }
+  .upload-area { border: 1px dashed var(--ink-faint); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; background: white; transition: border-color 0.2s; }
+  .upload-area:hover { border-color: var(--accent); }
+  .upload-area p { font-size: 13px; color: var(--ink-light); }
+  .upload-area .fname { font-size: 12px; font-weight: 500; color: var(--ink); margin-top: 4px; }
+  .abtn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 100px; padding: 12px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: var(--sans); margin-top: 8px; transition: opacity 0.2s; }
+  .abtn:hover { opacity: 0.85; }
+  .abtn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .abtn-save { background: transparent; color: var(--success); border: 1px solid var(--success); border-radius: 100px; padding: 10px; width: 100%; font-size: 14px; font-weight: 500; cursor: pointer; font-family: var(--sans); margin-top: 8px; }
+  .result-area { background: var(--cream); border: 0.5px solid var(--border); border-radius: 8px; padding: 1rem; font-size: 13px; line-height: 1.8; white-space: pre-wrap; min-height: 60px; color: var(--ink); }
+  .result-tag { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-light); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .score-big { font-family: var(--serif); font-size: 52px; text-align: center; padding: 1rem 0 0.25rem; }
+  .badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 100px; font-weight: 500; }
+  .badge-s { background: #EAF7F0; color: var(--success); }
+  .badge-w { background: #FFF3E8; color: var(--warn); }
+  .badge-d { background: #FDEAEA; color: var(--danger); }
+  .badge-i { background: var(--accent-light); color: var(--accent); }
+  .match-list { font-size: 13px; line-height: 2.1; }
+  .match-list div::before { content: '✓  '; color: var(--success); }
+  .gap-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; align-items: flex-start; }
+  .gap-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .copy-btn { font-size: 11px; color: var(--ink-light); background: none; border: 0.5px solid var(--border); border-radius: 6px; padding: 3px 9px; cursor: pointer; font-family: var(--sans); }
+  .copy-btn:hover { color: var(--ink); }
+  table.tracker { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.tracker th { text-align: left; padding: 8px 12px; font-size: 11px; color: var(--ink-light); border-bottom: 0.5px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+  table.tracker td { padding: 10px 12px; border-bottom: 0.5px solid var(--border); }
+  table.tracker tr:last-child td { border-bottom: none; }
+  .input-manual { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-top: 1rem; }
+  .ainp { border: 0.5px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; background: white; color: var(--ink); font-family: var(--sans); }
+  .add-row-btn { background: var(--ink); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer; font-family: var(--sans); }
+
+  /* ATS specific */
+  .ats-score-ring { display: flex; justify-content: center; align-items: center; padding: 1rem 0; }
+  .ats-ring-wrap { position: relative; width: 100px; height: 100px; }
+  .ats-ring-wrap svg { transform: rotate(-90deg); }
+  .ats-ring-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: var(--serif); font-size: 26px; }
+  .kw-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .kw-pill { font-size: 12px; padding: 4px 10px; border-radius: 100px; font-weight: 500; }
+  .kw-found { background: #EAF7F0; color: var(--success); }
+  .kw-missing { background: #FDEAEA; color: var(--danger); }
+  .section-divider { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-faint); margin: 1rem 0 6px; border-bottom: 0.5px solid var(--border); padding-bottom: 4px; }
+  .ats-resume-out { font-family: monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; background: var(--cream); border: 0.5px solid var(--border); border-radius: 8px; padding: 1rem; max-height: 360px; overflow-y: auto; color: var(--ink); }
+  .tip-box { background: var(--accent-light); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #185FA5; margin-top: 8px; line-height: 1.6; }
+
+  .cta-section { padding: 8rem 2rem; text-align: center; }
+  .cta-inner { max-width: 640px; margin: 0 auto; }
+  .cta-inner h2 { font-family: var(--serif); font-size: clamp(36px, 5vw, 60px); letter-spacing: -1px; line-height: 1.05; margin-bottom: 1.25rem; }
+  .cta-inner h2 em { font-style: italic; color: var(--accent); }
+  .cta-inner p { font-size: 17px; color: var(--ink-light); font-weight: 300; margin-bottom: 2.5rem; }
+
+  footer { border-top: 0.5px solid var(--border); padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; }
+  footer .logo { font-size: 18px; }
+  footer p { font-size: 13px; color: var(--ink-faint); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  .observe { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
+  .observe.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">Appli<span>core</span></a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#app">Try it</a>
+    <a href="#app" class="nav-cta">Get started</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">✦ AI-powered job applications</div>
+  <h1>Land your <em>dream role</em> with less effort</h1>
+  <p>Applicore analyzes job listings against your resume, writes tailored cover letters, optimizes for ATS, and tracks every application — all in one place.</p>
+  <div class="hero-actions">
+    <a href="#app" class="btn btn-primary">Start applying free →</a>
+    <a href="#how" class="btn btn-outline">See how it works</a>
+  </div>
+  <p class="hero-note">No account required &nbsp;·&nbsp; Free to use &nbsp;·&nbsp; Powered by Claude AI</p>
+</section>
+
+<div class="proof">
+  <p>Helping job seekers worldwide</p>
+  <div class="proof-stats">
+    <div><div class="stat-val">3×</div><div class="stat-label">More interviews on average</div></div>
+    <div><div class="stat-val">&lt; 60s</div><div class="stat-label">To generate a cover letter</div></div>
+    <div><div class="stat-val">94%</div><div class="stat-label">Say it saved them hours</div></div>
+    <div><div class="stat-val">ATS</div><div class="stat-label">Resume optimization built in</div></div>
+  </div>
+</div>
+
+<section class="features" id="features">
+  <div class="observe">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need to apply smarter</h2>
+    <p class="section-sub">Stop spending hours writing cover letters and guessing what ATS systems want. Let Applicore do the hard work.</p>
+  </div>
+  <div class="features-grid observe">
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <h3>AI cover letters</h3>
+      <p>Paste a job listing and your resume. Applicore writes a personalized, professional cover letter in seconds.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <h3>Fit score analysis</h3>
+      <p>Get an instant compatibility score showing how well your background matches the role's requirements.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+      <h3>ATS resume optimizer</h3>
+      <p>Rewrites your resume with the exact keywords ATS systems scan for, in a clean parseable format.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+      <h3>Keyword gap checker</h3>
+      <p>See exactly which keywords from the job listing are missing from your resume before you apply.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <h3>Application tracker</h3>
+      <p>Keep every application organized in one dashboard — from applied to offer, all in one view.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <h3>Gap detection</h3>
+      <p>Identify missing skills or experiences before you apply, so you can address them proactively.</p>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="observe">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">Four steps to a stronger application</h2>
+    </div>
+    <div class="steps observe">
+      <div class="step"><div class="step-num">01</div><div><h3>Upload your resume</h3><p>Drop in your PDF or paste your resume text. Applicore parses it instantly.</p></div></div>
+      <div class="step"><div class="step-num">02</div><div><h3>Paste the job listing</h3><p>Copy the full job description from LinkedIn, Indeed, or anywhere else.</p></div></div>
+      <div class="step"><div class="step-num">03</div><div><h3>Get your ATS-optimized resume</h3><p>Applicore rewrites your resume to match the job's keywords and pass ATS scanners — in a clean, parseable plain-text format.</p></div></div>
+      <div class="step"><div class="step-num">04</div><div><h3>Generate your cover letter & apply</h3><p>Copy your tailored cover letter and ATS resume, then apply with confidence.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="app-section" id="app">
+  <div class="observe" style="text-align:center; margin-bottom:2.5rem;">
+    <div class="section-label">Try Applicore</div>
+    <h2 class="section-title" style="max-width:100%; text-align:center;">Your AI application assistant</h2>
+  </div>
+  <div class="app-wrapper observe">
+    <div class="app-bar">
+      <div class="app-dot" style="background:#FF5F57"></div>
+      <div class="app-dot" style="background:#FEBC2E"></div>
+      <div class="app-dot" style="background:#28C840"></div>
+      <span class="app-title">applicore.app</span>
+    </div>
+    <div class="app-body">
+      <div class="atabs">
+        <button class="atab active" onclick="switchTab('apply',this)">✦ Apply</button>
+        <button class="atab" onclick="switchTab('ats',this)">ATS Resume</button>
+        <button class="atab" onclick="switchTab('tracker',this)">Tracker</button>
+      </div>
+
+      <!-- APPLY TAB -->
+      <div id="apanel-apply" class="apanel active">
+        <div class="arow">
+          <div>
+            <div class="acard">
+              <label>Your resume</label>
+              <div class="upload-area" onclick="document.getElementById('rf').click()">
+                <p>Click to upload PDF or .txt</p>
+                <p class="fname" id="flabel"></p>
+              </div>
+              <input type="file" id="rf" accept=".pdf,.txt" style="display:none" onchange="handleFile(this)">
+              <textarea class="ainput" id="resume-text" rows="5" placeholder="Or paste your resume text..." style="margin-top:8px"></textarea>
+            </div>
+          </div>
+          <div>
+            <div class="acard">
+              <label>Job listing</label>
+              <textarea class="ainput" id="job-text" rows="11" placeholder="Paste the full job description here..."></textarea>
+            </div>
+          </div>
+        </div>
+        <button class="abtn" id="analyze-btn" onclick="analyze()">✦ Generate cover letter & analyze fit</button>
+
+        <div id="results" style="margin-top:1.5rem; display:none;">
+          <div class="acard">
+            <div class="result-tag">Cover letter <button class="copy-btn" onclick="copyText('cl-out')">Copy</button></div>
+            <div class="result-area" id="cl-out"></div>
+          </div>
+          <div class="arow">
+            <div class="acard">
+              <div class="result-tag">Fit score</div>
+              <div class="score-big" id="score-out">—</div>
+              <div style="text-align:center; font-size:13px; color:var(--ink-light); padding-bottom:0.5rem" id="score-lbl"></div>
+            </div>
+            <div class="acard">
+              <div class="result-tag">Key matches</div>
+              <div class="match-list" id="matches-out"></div>
+            </div>
+          </div>
+          <div class="acard">
+            <div class="result-tag">Gaps & suggestions</div>
+            <div id="gaps-out"></div>
+          </div>
+          <button class="abtn-save" onclick="saveToTracker()">+ Save to tracker</button>
+        </div>
+      </div>
+
+      <!-- ATS TAB -->
+      <div id="apanel-ats" class="apanel">
+        <div class="tip-box" style="margin-bottom:1rem;">
+          ✦ ATS (Applicant Tracking System) scanners filter resumes before a human ever sees them. This tab rewrites your resume to maximize keyword matches and use ATS-safe formatting.
+        </div>
+        <div class="arow">
+          <div>
+            <div class="acard">
+              <label>Your resume</label>
+              <textarea class="ainput" id="ats-resume-text" rows="8" placeholder="Paste your resume text here..."></textarea>
+            </div>
+          </div>
+          <div>
+            <div class="acard">
+              <label>Job listing</label>
+              <textarea class="ainput" id="ats-job-text" rows="8" placeholder="Paste the job description here..."></textarea>
+            </div>
+          </div>
+        </div>
+        <button class="abtn" id="ats-btn" onclick="runATS()">✦ Optimize for ATS</button>
+
+        <div id="ats-results" style="margin-top:1.5rem; display:none;">
+          <div class="arow">
+            <div class="acard">
+              <div class="result-tag">ATS score</div>
+              <div class="ats-score-ring">
+                <div class="ats-ring-wrap">
+                  <svg width="100" height="100" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="#eee" stroke-width="10"/>
+                    <circle id="ats-ring" cx="50" cy="50" r="42" fill="none" stroke="#2D5BE3" stroke-width="10" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264"/>
+                  </svg>
+                  <div class="ats-ring-val" id="ats-score-val">—</div>
+                </div>
+              </div>
+              <div style="text-align:center; font-size:12px; color:var(--ink-light)" id="ats-score-lbl"></div>
+            </div>
+            <div class="acard">
+              <div class="result-tag">Keyword analysis</div>
+              <div class="section-divider">Found in your resume</div>
+              <div class="kw-grid" id="kw-found"></div>
+              <div class="section-divider" style="margin-top:12px;">Missing — add these</div>
+              <div class="kw-grid" id="kw-missing"></div>
+            </div>
+          </div>
+
+          <div class="acard">
+            <div class="result-tag">
+              ATS-optimized resume
+              <button class="copy-btn" onclick="copyText('ats-resume-out')">Copy plain text</button>
+            </div>
+            <div class="tip-box" style="margin-bottom:8px; font-size:11px;">
+              This version uses plain text, standard headings, and exact job keywords — safe for all ATS systems. Paste this into application forms or a plain Word doc.
+            </div>
+            <div class="ats-resume-out" id="ats-resume-out"></div>
+          </div>
+
+          <div class="acard">
+            <div class="result-tag">ATS tips for this application</div>
+            <div id="ats-tips-out" style="font-size:13px; line-height:1.8;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRACKER TAB -->
+      <div id="apanel-tracker" class="apanel">
+        <table class="tracker">
+          <thead><tr><th>Company</th><th>Role</th><th>Date applied</th><th>Status</th></tr></thead>
+          <tbody id="tracker-body">
+            <tr id="empty-row"><td colspan="4" style="color:var(--ink-faint); text-align:center; padding:2rem;">No applications yet. Use the Apply tab to get started.</td></tr>
+          </tbody>
+        </table>
+        <div class="input-manual">
+          <input class="ainp" id="add-co" placeholder="Company">
+          <input class="ainp" id="add-role" placeholder="Role">
+          <select class="ainp" id="add-status">
+            <option>Applied</option><option>Screening</option><option>Interview</option><option>Offer</option><option>Rejected</option>
+          </select>
+          <button class="add-row-btn" onclick="addManual()">Add</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-inner observe">
+    <h2>Ready to apply with <em>confidence</em>?</h2>
+    <p>Join thousands of job seekers who use Applicore to get more interviews with less stress.</p>
+    <a href="#app" class="btn btn-primary" style="font-size:16px; padding:16px 36px;">Start for free →</a>
+  </div>
+</section>
+
+<footer>
+  <a class="logo" href="#">Appli<span>core</span></a>
+  <p>© 2026 Applicore. Built with Claude AI.</p>
+</footer>
+
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.observe').forEach(el => obs.observe(el));
+
+  let lastResult = null;
+
+  function switchTab(t, btn) {
+    document.querySelectorAll('.atab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.apanel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('apanel-' + t).classList.add('active');
+  }
+
+  function handleFile(input) {
+    const file = input.files[0]; if (!file) return;
+    document.getElementById('flabel').textContent = file.name;
+    const r = new FileReader();
+    r.onload = e => {
+      const txt = e.target.result;
+      document.getElementById('resume-text').value = txt;
+      document.getElementById('ats-resume-text').value = txt;
+    };
+    r.readAsText(file);
+  }
+
+  async function callClaude(prompt, maxTokens) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens || 1000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const text = data.content.map(i => i.text || '').join('');
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
+  }
+
+  async function analyze() {
+    const resume = document.getElementById('resume-text').value.trim();
+    const job = document.getElementById('job-text').value.trim();
+    if (!resume || !job) { alert('Please provide both resume and job listing.'); return; }
+    const btn = document.getElementById('analyze-btn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Analyzing...';
+    document.getElementById('results').style.display = 'none';
+    try {
+      const parsed = await callClaude(`You are a career coach AI. Analyze the resume and job listing. Respond ONLY with valid JSON, no markdown:
+{"coverLetter":"3-4 paragraph tailored cover letter","fitScore":85,"fitLabel":"Good fit","keyMatches":["match1","match2","match3","match4"],"gaps":[{"level":"high","text":"gap description"}],"company":"Company name","role":"Job title"}
+
+RESUME:\n${resume}\n\nJOB LISTING:\n${job}`);
+      lastResult = parsed;
+      renderResults(parsed);
+      document.getElementById('ats-job-text').value = job;
+    } catch(e) { alert('Something went wrong. Try again.'); console.error(e); }
+    btn.disabled = false; btn.innerHTML = '✦ Generate cover letter & analyze fit';
+  }
+
+  function renderResults(d) {
+    document.getElementById('cl-out').textContent = d.coverLetter;
+    const s = d.fitScore;
+    const scoreEl = document.getElementById('score-out');
+    scoreEl.textContent = s + '%';
+    scoreEl.style.color = s >= 75 ? 'var(--success)' : s >= 50 ? 'var(--warn)' : 'var(--danger)';
+    document.getElementById('score-lbl').textContent = d.fitLabel;
+    document.getElementById('matches-out').innerHTML = d.keyMatches.map(m => `<div>${m}</div>`).join('');
+    const gc = { high: 'var(--danger)', medium: 'var(--warn)', low: 'var(--success)' };
+    document.getElementById('gaps-out').innerHTML = d.gaps.map(g => `<div class="gap-row"><div class="gap-dot" style="background:${gc[g.level]||'#888'}"></div><div>${g.text}</div></div>`).join('');
+    document.getElementById('results').style.display = 'block';
+  }
+
+  async function runATS() {
+    const resume = document.getElementById('ats-resume-text').value.trim();
+    const job = document.getElementById('ats-job-text').value.trim();
+    if (!resume || !job) { alert('Please provide both resume and job listing.'); return; }
+    const btn = document.getElementById('ats-btn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Optimizing for ATS...';
+    document.getElementById('ats-results').style.display = 'none';
+    try {
+      const parsed = await callClaude(`You are an ATS optimization expert. Analyze the resume against the job listing and rewrite it for maximum ATS compatibility. Respond ONLY with valid JSON, no markdown:
+{
+  "atsScore": 72,
+  "atsLabel": "Needs improvement",
+  "keywordsFound": ["keyword1","keyword2","keyword3"],
+  "keywordsMissing": ["missing1","missing2","missing3"],
+  "optimizedResume": "Full ATS-friendly plain text resume here. Use standard sections: SUMMARY, EXPERIENCE, EDUCATION, SKILLS. No special characters, no tables, no columns. Incorporate missing keywords naturally. Keep all real experience intact.",
+  "atsTips": ["Tip 1 specific to this application","Tip 2","Tip 3","Tip 4"]
+}
+
+RESUME:\n${resume}\n\nJOB LISTING:\n${job}`, 2000);
+      renderATS(parsed);
+    } catch(e) { alert('Something went wrong. Try again.'); console.error(e); }
+    btn.disabled = false; btn.innerHTML = '✦ Optimize for ATS';
+  }
+
+  function renderATS(d) {
+    const score = d.atsScore;
+    const offset = 264 - (264 * score / 100);
+    const ring = document.getElementById('ats-ring');
+    ring.style.strokeDashoffset = offset;
+    ring.style.stroke = score >= 75 ? '#1A8A5A' : score >= 50 ? '#B85C00' : '#B82424';
+    document.getElementById('ats-score-val').textContent = score + '%';
+    document.getElementById('ats-score-val').style.color = score >= 75 ? 'var(--success)' : score >= 50 ? 'var(--warn)' : 'var(--danger)';
+    document.getElementById('ats-score-lbl').textContent = d.atsLabel;
+    document.getElementById('kw-found').innerHTML = (d.keywordsFound||[]).map(k => `<span class="kw-pill kw-found">✓ ${k}</span>`).join('');
+    document.getElementById('kw-missing').innerHTML = (d.keywordsMissing||[]).map(k => `<span class="kw-pill kw-missing">+ ${k}</span>`).join('');
+    document.getElementById('ats-resume-out').textContent = d.optimizedResume;
+    document.getElementById('ats-tips-out').innerHTML = (d.atsTips||[]).map((t,i) => `<div class="gap-row"><div class="gap-dot" style="background:var(--accent)"></div><div>${t}</div></div>`).join('');
+    document.getElementById('ats-results').style.display = 'block';
+  }
+
+  function copyText(id) {
+    const el = document.getElementById(id);
+    navigator.clipboard.writeText(el.textContent);
+    const original = event.target.textContent;
+    event.target.textContent = 'Copied!';
+    setTimeout(() => event.target.textContent = original, 1500);
+  }
+
+  const statusClass = { Applied:'badge-i', Screening:'badge-w', Interview:'badge-w', Offer:'badge-s', Rejected:'badge-d' };
+
+  function saveToTracker() {
+    if (!lastResult) return;
+    addRow({ company: lastResult.company||'—', role: lastResult.role||'—', date: new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), status:'Applied' });
+    document.querySelectorAll('.atab')[2].click();
+  }
+
+  function addRow(app) {
+    const body = document.getElementById('tracker-body');
+    const empty = document.getElementById('empty-row');
+    if (empty) empty.remove();
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-weight:500">${app.company}</td><td style="color:var(--ink-light)">${app.role}</td><td style="color:var(--ink-faint);font-size:12px">${app.date}</td><td><span class="badge ${statusClass[app.status]||'badge-i'}">${app.status}</span></td>`;
+    body.appendChild(tr);
+  }
+
+  function addManual() {
+    const co = document.getElementById('add-co').value.trim();
+    const role = document.getElementById('add-role').value.trim();
+    if (!co || !role) return;
+    addRow({ company:co, role, date: new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), status: document.getElementById('add-status').value });
+    document.getElementById('add-co').value = ''; document.getElementById('add-role').value = '';
+  }
+</script>
+</body>
+</html>
