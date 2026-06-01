@@ -243,6 +243,15 @@
       <span class="app-title">applicore.app</span>
     </div>
     <div class="app-body">
+      <!-- API KEY BANNER -->
+      <div id="key-banner" style="background:#FFF3E8; border:0.5px solid #F5C4B3; border-radius:10px; padding:12px 16px; margin-bottom:1.25rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span style="font-size:13px; color:#B85C00; font-weight:500; white-space:nowrap;">🔑 Your Anthropic API key</span>
+        <input id="api-key-input" type="password" placeholder="Paste your sk-ant-... key here" style="flex:1; min-width:220px; border:0.5px solid #F0997B; border-radius:8px; padding:7px 12px; font-size:13px; font-family:var(--sans); color:var(--ink); background:white;">
+        <button onclick="saveKey()" style="background:#B85C00; color:white; border:none; border-radius:8px; padding:7px 16px; font-size:13px; font-weight:500; cursor:pointer; font-family:var(--sans); white-space:nowrap;">Save</button>
+        <span id="key-status" style="font-size:12px; color:#1A8A5A; display:none;">✓ Key saved for this session</span>
+      </div>
+      <div style="font-size:11px; color:var(--ink-faint); margin-bottom:1rem; margin-top:-8px;">Your key is stored only in your browser memory and never sent anywhere except directly to Anthropic.</div>
+
       <div class="atabs">
         <button class="atab active" onclick="switchTab('apply',this)">✦ Apply</button>
         <button class="atab" onclick="switchTab('ats',this)">ATS Resume</button>
@@ -401,6 +410,17 @@
   document.querySelectorAll('.observe').forEach(el => obs.observe(el));
 
   let lastResult = null;
+  let userApiKey = "";
+
+  function saveKey() {
+    const val = document.getElementById("api-key-input").value.trim();
+    if (!val.startsWith("sk-ant-")) { alert("That does not look like a valid Anthropic key. It should start with sk-ant-"); return; }
+    userApiKey = val;
+    document.getElementById("key-status").style.display = "inline";
+    document.getElementById("api-key-input").value = "••••••••••••••••••••";
+    document.getElementById("key-banner").style.background = "#EAF7F0";
+    document.getElementById("key-banner").style.borderColor = "#9FE1CB";
+  }
 
   function switchTab(t, btn) {
     document.querySelectorAll('.atab').forEach(b => b.classList.remove('active'));
@@ -424,7 +444,7 @@
   async function callClaude(prompt, maxTokens) {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': userApiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens || 1000, messages: [{ role: 'user', content: prompt }] })
     });
     const data = await res.json();
@@ -433,6 +453,7 @@
   }
 
   async function analyze() {
+    if (!userApiKey) { alert('Please enter and save your Anthropic API key first.'); return; }
     const resume = document.getElementById('resume-text').value.trim();
     const job = document.getElementById('job-text').value.trim();
     if (!resume || !job) { alert('Please provide both resume and job listing.'); return; }
@@ -465,6 +486,7 @@ RESUME:\n${resume}\n\nJOB LISTING:\n${job}`);
   }
 
   async function runATS() {
+    if (!userApiKey) { alert('Please enter and save your Anthropic API key first.'); return; }
     const resume = document.getElementById('ats-resume-text').value.trim();
     const job = document.getElementById('ats-job-text').value.trim();
     if (!resume || !job) { alert('Please provide both resume and job listing.'); return; }
